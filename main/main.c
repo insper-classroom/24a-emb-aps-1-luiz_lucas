@@ -16,6 +16,7 @@ volatile int g=0;
 volatile int b=0;
 volatile int y=0;
 volatile int t=0;
+volatile int click=0;
 
 volatile int ingame=0;
 
@@ -150,7 +151,8 @@ int main() {
   gpio_set_irq_enabled(BTN_PIN_T, GPIO_IRQ_EDGE_FALL|GPIO_IRQ_EDGE_RISE, true);
 
   //scanf("mode (0,1): %d", &mode);
-  uint32_t fall, rise;
+  uint32_t rise, fall;
+  
 
   uint32_t *a = (uint32_t*)malloc(1+1);
   a=pico_flash_read(FLASH_TARGET_OFFSET, 1); 
@@ -201,18 +203,18 @@ int main() {
       sequencia(rodada, vetor, mode);
       
     }
-
     
     if (t==1){
       //printf("apertouT1\n");
       t = 0;
       fall = to_ms_since_boot(get_absolute_time());
     }
-    else if (t==2){
+    else if (t==2){ 
       //printf("apertouT2\n");
       rise = to_ms_since_boot(get_absolute_time());
+
       printf("hold: %d\n",rise-fall);
-      if (rise - fall > 300) {
+      if (rise - fall > 500) {
         a=pico_flash_read(FLASH_TARGET_OFFSET, 1); 
         printf("RECORDE: %d\n",a[0]);
         gameover(a[0]);
@@ -228,10 +230,10 @@ int main() {
           sequencia(rodada, vetor, mode);
         }
       }
+      
       t=0;
     }
   }
-  free(a);
 }
 
 void pin_init(void) {
