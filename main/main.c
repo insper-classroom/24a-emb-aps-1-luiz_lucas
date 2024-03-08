@@ -152,7 +152,7 @@ int main() {
   //scanf("mode (0,1): %d", &mode);
   uint32_t fall, rise;
 
-  uint32_t *a = (uint32_t*)malloc(3 + 1);
+  uint32_t *a = (uint32_t*)malloc(1+1);
   a=pico_flash_read(FLASH_TARGET_OFFSET, 1); 
   score=a[0];
 
@@ -231,6 +231,7 @@ int main() {
       t=0;
     }
   }
+  free(a);
 }
 
 void pin_init(void) {
