@@ -1,4 +1,7 @@
 
+#ifndef constantes
+#define constantes 
+
 
 // const int BTN_PIN_R = 8;
 // const int BTN_PIN_G = 6;
@@ -28,6 +31,8 @@ const double jit=10;
 
 const int BUZZPIN = 20;
 const int BUZZPIN2 = 10;
+
+#endif
 
 
 

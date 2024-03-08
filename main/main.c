@@ -112,6 +112,7 @@ void btn_callback(uint gpio, uint32_t events) {
   
   if (events == 0x4) { // fall edge
         if (ingame){
+          ingame=1;
           if (gpio == BTN_PIN_R) r=1;
           if (gpio == BTN_PIN_G) g=1;
           if (gpio == BTN_PIN_B) b=1;
