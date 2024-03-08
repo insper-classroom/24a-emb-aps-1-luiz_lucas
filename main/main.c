@@ -10,7 +10,6 @@
 
 
 #define FLASH_TARGET_OFFSET (1792*1024)                                                         //++ Starting Flash Storage location after 1.8MB ( of the 2MB )
-const uint8_t *flash_target_contents = (const uint8_t *) (XIP_BASE + FLASH_TARGET_OFFSET);   
 
 volatile int r=0;
 volatile int g=0;
