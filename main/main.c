@@ -87,8 +87,8 @@ void confere(int botao, int v[], int *nc, int *rodada, uint8_t *score, uint32_t 
 
 void sequencia (int n, int v[], int mode) {
    int i;
-   time_t t;
-   srand((unsigned) time(&t));
+   time_t temp;
+   srand((unsigned) time(&temp));
    if (!mode){
     v[n-1]=rand() % 4;
    }
