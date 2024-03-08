@@ -1,21 +1,21 @@
-#ifndef constantes
-#define constantes
+#ifndef CONSTANTES_H
+#define CONSTANTES_H
 
-const int BTN_PIN_R = 27;
-const int BTN_PIN_G = 26;
-const int BTN_PIN_B = 18;
-const int BTN_PIN_Y = 22;
-const int BTN_PIN_T = 28;
+extern const int BTN_PIN_R;
+extern const int BTN_PIN_G;
+extern const int BTN_PIN_B;
+extern const int BTN_PIN_Y;
+extern const int BTN_PIN_T;
 
-const int LED_PIN_R = 8;
-const int LED_PIN_G = 14;
-const int LED_PIN_B = 11;
-const int LED_PIN_Y = 10;
-const int LED_PIN_I = 5;
+extern const int LED_PIN_R;
+extern const int LED_PIN_G;
+extern const int LED_PIN_B;
+extern const int LED_PIN_Y;
+extern const int LED_PIN_I;
 
-const double jit = 10;
+extern const double jit;
 
-const int BUZZPIN = 20;
-const int BUZZPIN2 = 10;
+extern const int BUZZPIN;
+extern const int BUZZPIN2;
 
 #endif
