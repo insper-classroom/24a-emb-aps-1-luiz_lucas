@@ -63,7 +63,7 @@ void gameover(uint8_t rodada){
 
 }
 
-void confere(int botao, int v[], int *nc, int *rodada, uint8_t *score, uint32_t flash_data[]){
+void confere(int botao, const int v[], int *nc, int *rodada, uint8_t *score, uint32_t flash_data[]){
       
 
   if (v[*nc]==botao){
