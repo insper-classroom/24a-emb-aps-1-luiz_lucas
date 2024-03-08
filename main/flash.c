@@ -45,12 +45,12 @@ int pico_flash_write(long int FLASH_TARGET_OFFSET, uint32_t flash_data[], size_t
     if (strcmp(stored_value,flash_data)==0)                                                             //++ Compares the stored and written data 
         {
             printf(GREEN "\n COMMIT SUCCESSFULL \n" RESET);
-            return "OK";
+            return 1;
         }
     else
         {
             printf(RED "\n COMMIT UNSUCCESSFULL \n" RESET);
-            return "ERR";
+            return 0;
         }
 }
 
