@@ -1,14 +1,11 @@
 #include "hardware/gpio.h"
-#include "string.h"
 #include "pico/stdlib.h"
 #include <stdio.h>
 #include "constantes.h"
+#include <hardware/flash.h>
 #include "flash.h"
-#include "flash.c"
 
-#include "hardware/flash.h"
 #include "hardware/sync.h"
-
 
 #define FLASH_TARGET_OFFSET (1792*1024)                                                         //++ Starting Flash Storage location after 1.8MB ( of the 2MB )
 const uint8_t *flash_target_contents = (const uint8_t *) (XIP_BASE + FLASH_TARGET_OFFSET);   
@@ -74,7 +71,6 @@ void confere(int botao, int v[], int *nc, int *rodada, uint8_t *score, uint32_t 
     if (*rodada>*score){
       *score=*rodada;
       flash_data[0]=*score;
-      pico_flash_write(FLASH_TARGET_OFFSET, flash_data, 1);
     }
     *nc=0;
     som(3000, 500, BUZZPIN);
@@ -138,7 +134,7 @@ int main() {
   uint8_t score = 0;
   uint32_t flash_data[FLASH_PAGE_SIZE];  
 
-  //pico_flash_erase(FLASH_TARGET_OFFSET);                                                      //++ Flash operation to erase entire flash page ( 256 locations together )
+  pico_flash_erase(FLASH_TARGET_OFFSET);                                                      //++ Flash operation to erase entire flash page ( 256 locations together )
   pico_flash_read(FLASH_TARGET_OFFSET, 1); 
 
   gpio_put(LED_PIN_I, 1);
@@ -153,16 +149,11 @@ int main() {
 
   //scanf("mode (0,1): %d", &mode);
   uint32_t fall, rise;
-
-  uint32_t *a = (uint32_t*)malloc(3 + 1);
-  a=pico_flash_read(FLASH_TARGET_OFFSET, 1); 
-  score=a[0];
-
   while (true) {
     if (r){
       busy_wait_ms(jit);
       if (ingame){
-        //printf("apertouR\n");
+        printf("apertouR\n");
         led(LED_PIN_R,1900);
         confere(0, vetor, &nc, &rodada, &score, flash_data);
       }
@@ -171,7 +162,7 @@ int main() {
     if (g){
       busy_wait_ms(jit);
       if (ingame){
-        //printf("apertouG\n");
+        printf("apertouG\n");
         led(LED_PIN_G,2000);
         confere(1, vetor, &nc, &rodada, &score, flash_data);
       }
@@ -180,7 +171,7 @@ int main() {
     if (b){
       busy_wait_ms(jit);
       if (ingame){
-        //printf("apertouB\n");
+        printf("apertouB\n");
         led(LED_PIN_B,2100);
         confere(2, vetor, &nc, &rodada, &score, flash_data);
       }
@@ -189,7 +180,7 @@ int main() {
     if (y){
       busy_wait_ms(jit);
       if (ingame){
-        //printf("apertouY\n");
+        printf("apertouY\n");
         led(LED_PIN_Y, 2200);
         confere(3, vetor, &nc, &rodada, &score, flash_data);
       }
@@ -206,18 +197,17 @@ int main() {
 
     
     if (t==1){
-      //printf("apertouT1\n");
+      printf("apertouT1\n");
       t = 0;
       fall = to_ms_since_boot(get_absolute_time());
     }
     else if (t==2){
-      //printf("apertouT2\n");
+      printf("apertouT2\n");
       rise = to_ms_since_boot(get_absolute_time());
       printf("hold: %d\n",rise-fall);
-      if (rise - fall > 300) {
-        a=pico_flash_read(FLASH_TARGET_OFFSET, 1); 
-        printf("RECORDE: %d\n",a[0]);
-        gameover(a[0]);
+      if (rise - fall > 500) {
+        printf("RECORDE: %d\n",flash_data[0]);
+        gameover(score);
         t=0;
       }
       else{
