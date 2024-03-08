@@ -23,7 +23,7 @@ int *pico_flash_read(long int FLASH_TARGET_OFFSET, size_t len)
         stored_value[i] = flash_target_contents[i];
     }
 
-    return stored_value;                                                                               //++ Returns the pointer pointing to the array
+    return stored_value;                                                                                //++ Returns the pointer pointing to the array
 }
 
 

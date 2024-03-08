@@ -2,10 +2,9 @@
 #include "string.h"
 #include "pico/stdlib.h"
 #include <stdio.h>
-#include "constantes.h"
 #include "flash.h"
 #include "flash.c"
-
+#include "constantes.h"
 #include "hardware/flash.h"
 #include "hardware/sync.h"
 
