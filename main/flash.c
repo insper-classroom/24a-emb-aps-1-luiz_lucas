@@ -29,7 +29,7 @@ int *pico_flash_read(long int FLASH_TARGET_OFFSET, size_t len)
 
 int pico_flash_write(long int FLASH_TARGET_OFFSET, uint32_t flash_data[], size_t num)
 {
-    const uint8_t *flash_target_contents = (const uint8_t *) (XIP_BASE + FLASH_TARGET_OFFSET);
+    //const uint8_t *flash_target_contents = (const uint8_t *) (XIP_BASE + FLASH_TARGET_OFFSET);
     uint32_t *stored_value = (uint32_t*)malloc(num + 1);
 
     uint32_t interrupts = save_and_disable_interrupts();

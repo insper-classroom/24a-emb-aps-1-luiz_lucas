@@ -138,7 +138,6 @@ int main() {
   uint32_t flash_data[FLASH_PAGE_SIZE];  
 
   //pico_flash_erase(FLASH_TARGET_OFFSET);                                                      //++ Flash operation to erase entire flash page ( 256 locations together )
-  pico_flash_read(FLASH_TARGET_OFFSET, 1); 
 
   gpio_put(LED_PIN_I, 1);
   
