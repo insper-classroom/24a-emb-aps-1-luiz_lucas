@@ -7,6 +7,7 @@
 #include "constantes.h"
 #include "hardware/flash.h"
 #include "hardware/sync.h"
+#include "sons.h"
 
 
 #define FLASH_TARGET_OFFSET (1792*1024)                                                         //++ Starting Flash Storage location after 1.8MB ( of the 2MB )
@@ -16,24 +17,10 @@ volatile int g=0;
 volatile int b=0;
 volatile int y=0;
 volatile int t=0;
-volatile int click=0;
-
 volatile int ingame=0;
+volatile int reset_record=0;
 
 void pin_init(void);
-
-
-
-void som(int freq, int tempo, int pino){
-  int periodo = 1000000/freq;
-  for (int i=0; i<tempo* 1000 / periodo;i++){
-    gpio_put(pino,1);
-    sleep_us(periodo/2);
-    gpio_put(pino,0);
-    sleep_us(periodo/2);
-  }
-  
-}
 
 void led (int pino, int freq){
   gpio_put(pino, 1);
@@ -42,7 +29,7 @@ void led (int pino, int freq){
   sleep_ms(200);
 }
 
-void gameover(uint8_t rodada){
+/* void showPoints(uint8_t rodada){
   printf("RODADA: %d\n", rodada);
   //som(3000, 500, BUZZPIN);
   for (int i=0; i<rodada-1;i++){
@@ -59,13 +46,10 @@ void gameover(uint8_t rodada){
     sleep_ms(200);
   }
   gpio_put(LED_PIN_I, 1);
-
-
 }
+ */
 
 void confere(int botao, const int v[], int *nc, int *rodada, uint8_t *score, uint32_t flash_data[]){
-      
-
   if (v[*nc]==botao){
     *nc=*nc+1;
   }else{
@@ -76,8 +60,9 @@ void confere(int botao, const int v[], int *nc, int *rodada, uint8_t *score, uin
       pico_flash_write(FLASH_TARGET_OFFSET, flash_data, 1);
     }
     *nc=0;
-    som(3000, 500, BUZZPIN);
-    gameover(*rodada);
+
+    looseSound(BUZZPIN, LED_PIN_R, LED_PIN_G, LED_PIN_B, LED_PIN_Y);
+    pointsCountingSound(*rodada-1, BUZZPIN, LED_PIN_R, LED_PIN_G, LED_PIN_B, LED_PIN_Y, LED_PIN_I);
     *rodada=1;
     ingame=0;
     
@@ -108,28 +93,38 @@ void sequencia (int n, int v[], int mode) {
 }
 
 void btn_callback(uint gpio, uint32_t events) {
-  
   if (events == 0x4) { // fall edge
-        if (ingame){
-          ingame=1;
-          if (gpio == BTN_PIN_R) r=1;
-          if (gpio == BTN_PIN_G) g=1;
-          if (gpio == BTN_PIN_B) b=1;
-          if (gpio == BTN_PIN_Y) y=1;
-        }
-        if (gpio == BTN_PIN_T) t=1;
+    if (ingame){
+      ingame=1;
+      if (gpio == BTN_PIN_R) r=1;
+      if (gpio == BTN_PIN_G) g=1;
+      if (gpio == BTN_PIN_B) b=1;
+      if (gpio == BTN_PIN_Y) y=1;
+    } else {
+      if (gpio == BTN_PIN_T) t=1;
 
-    } else if (events == 0x8) { // rise edge
-        if (gpio == BTN_PIN_T) t=2;
-        
+      if (gpio == BTN_PIN_B) reset_record=1;
+      if (gpio == BTN_PIN_G && reset_record==1) reset_record=2;
+      if (gpio == BTN_PIN_Y && reset_record==2) reset_record=3;
+      if (gpio == BTN_PIN_R && reset_record==3) reset_record=4;
     }
-  
+
+  } else if (events == 0x8) { // rise edge
+    if (gpio == BTN_PIN_T) t=2;
+  }
+}
+
+volatile bool t_fired = false;
+int64_t alarm_callback(alarm_id_t id, void *user_data) {
+  t_fired = true;
+  // Can return a value here in us to fire in the future
+  return 0;
 }
 
 int main() {
+  
   stdio_init_all();
   pin_init();
-
 
   int rodada=1;
   int nc=0;
@@ -141,8 +136,6 @@ int main() {
   //pico_flash_erase(FLASH_TARGET_OFFSET);                                                      //++ Flash operation to erase entire flash page ( 256 locations together )
 
   gpio_put(LED_PIN_I, 1);
-  
-  
 
   gpio_set_irq_enabled_with_callback(BTN_PIN_R, GPIO_IRQ_EDGE_FALL, true, &btn_callback);
   gpio_set_irq_enabled(BTN_PIN_G, GPIO_IRQ_EDGE_FALL, true);
@@ -151,14 +144,22 @@ int main() {
   gpio_set_irq_enabled(BTN_PIN_T, GPIO_IRQ_EDGE_FALL|GPIO_IRQ_EDGE_RISE, true);
 
   //scanf("mode (0,1): %d", &mode);
-  uint32_t rise, fall;
-  
-
+  uint32_t t_press_duration, fall;
   uint32_t *a = (uint32_t*)malloc(1+1);
   a=pico_flash_read(FLASH_TARGET_OFFSET, 1); 
   score=a[0];
 
+  int t_count = 0;
   while (true) {
+
+    if (reset_record == 4) {
+      reset_record = 0;
+      t=0;
+      t_count=0;
+      printf("TUDO JUNTO\n");
+      resetRecordSound(BUZZPIN, LED_PIN_R, LED_PIN_G, LED_PIN_B, LED_PIN_Y);
+    }
+
     if (r){
       busy_wait_ms(jit);
       if (ingame){
@@ -205,12 +206,66 @@ int main() {
     }
     
     if (t==1){
+      printf("APERTOU PRINTIPAL\n");
+      busy_wait_ms(jit);
       //printf("apertouT1\n");
       t = 0;
+      reset_record = 0;
       fall = to_ms_since_boot(get_absolute_time());
+      t_count ++;
+    } else if (t==2){ 
+      busy_wait_ms(jit);
+      //printf("soltouT1\n");
+      t = 0;
+      t_press_duration = to_ms_since_boot(get_absolute_time()) - fall;
+      //printf("Duração: %u\n", t_press_duration);
+      if (t_press_duration >= 1000 && t_count == 1){
+        printf("Pressionado por um segundo - MOSTRA RECORDE\n");
+        reset_record = 0;
+        t_count = 0;
+
+        a=pico_flash_read(FLASH_TARGET_OFFSET, 1); 
+        //showPoints(a[1]);
+        pointsCountingSound(20, BUZZPIN, LED_PIN_R, LED_PIN_G, LED_PIN_B, LED_PIN_Y, LED_PIN_I);
+
+
+      } else if (t_press_duration < 200 && t_count == 1) {
+        if (!add_alarm_in_ms(200, alarm_callback, NULL, false)) {
+          printf("Failed to add timer\n");
+        }
+      }
     }
-    else if (t==2){ 
-      //printf("apertouT2\n");
+
+    if(t_fired){
+      t_fired = 0;
+      if (t_count == 2){
+        printf("Pressionado duas vezes - MUDA O MODO\n");
+        t = 0;
+        t_count = 0;
+        reset_record = 0;
+
+        mode = !mode;
+        changeModeSound(BUZZPIN, LED_PIN_R, LED_PIN_G, LED_PIN_B, LED_PIN_Y);
+
+      } else {
+        printf("Pressionado uma vez - COMEÇA O JOGO\n");
+        t = 0;
+        t_count=0;
+        reset_record = 0;
+
+        if (!ingame){
+          /* for (int i=0;i<4;i++){
+          led(LED_PIN_I, 2000);
+          }
+          sleep_ms(300); */
+          gpio_put(LED_PIN_I,0);
+          startSound(BUZZPIN, LED_PIN_R, LED_PIN_G, LED_PIN_B, LED_PIN_Y);
+          sequencia(rodada, vetor, mode);
+        }
+      }
+    }
+
+      /* //printf("apertouT2\n");
       rise = to_ms_since_boot(get_absolute_time());
 
       printf("hold: %d\n",rise-fall);
@@ -231,9 +286,8 @@ int main() {
         }
       }
       
-      t=0;
-    }
-  }
+      t=0; */
+}
 }
 
 void pin_init(void) {
