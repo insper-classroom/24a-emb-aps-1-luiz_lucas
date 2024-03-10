@@ -19,7 +19,7 @@ int *pico_flash_read(long int FLASH_TARGET_OFFSET, size_t len)
 
     for (size_t i = 0; i < len; ++i)
     {
-        printf(CYAN "\n STORED VALUE : %d\n" RESET, flash_target_contents[i]);
+        printf(CYAN "\n STORED VALUE : %u\n" RESET, flash_target_contents[i]);
         stored_value[i] = flash_target_contents[i];
     }
 

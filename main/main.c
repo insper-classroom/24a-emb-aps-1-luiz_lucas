@@ -228,7 +228,7 @@ int main() {
 
         a=pico_flash_read(FLASH_TARGET_OFFSET, 1); 
         //showPoints(a[1]);
-        printf("RECORDE: %d\n", a[0]);
+        printf("RECORDE: %u\n", a[0]);
         recordCounting(a[0], BUZZPIN, LED_PIN_R, LED_PIN_G, LED_PIN_B, LED_PIN_Y, LED_PIN_I);
 
 

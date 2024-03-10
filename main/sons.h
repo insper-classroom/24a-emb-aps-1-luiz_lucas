@@ -29,7 +29,7 @@ void looseSound(int buzzpin, int ledr, int ledg, int ledb, int ledy) {
 }
 
 void startSound(int buzzpin, int ledr, int ledg, int ledb, int ledy) {
-  int freqs[] = {1500, 1500, 1500};
+  int freqs[] = {1000, 1000, 1000};
   int tempos[] = {220, 220, 220};
   int leds[] = {ledr, ledg, ledb, ledy};
 
@@ -41,7 +41,7 @@ void startSound(int buzzpin, int ledr, int ledg, int ledb, int ledy) {
   }
   // Som para o início da corrida
   gpio_put(leds[3], 1);
-  som(2300, 800, buzzpin);
+  som(1500, 800, buzzpin);
   for (int i = 0; i < 4; i++) {
     gpio_put(leds[i], 0);
   }
