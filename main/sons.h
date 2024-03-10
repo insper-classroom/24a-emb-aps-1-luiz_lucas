@@ -11,6 +11,16 @@ void som(int freq, int tempo, int pino){
   }
 }
 
+void playStartupMusic(int buzzpin) {
+  int melody[] = {262+200, 330+200, 392+200, 523+200, 392+200, 330+200, 262+200, 196+200};
+  int tempo[] = {200, 200, 200, 200, 200, 200, 200, 200}; 
+
+  for (int i = 0; i < sizeof(melody)-1 / sizeof(melody[0]); i++) {
+    som(melody[i], tempo[i], buzzpin);
+  }
+
+}
+
 void looseSound(int buzzpin, int ledr, int ledg, int ledb, int ledy) {
     int freqs_loose[] = {1000, 800, 600, 400};
     int tempos_loose[] = {200, 200, 200, 400};
@@ -63,8 +73,31 @@ void changeModeSound(int buzzpin, int ledr, int ledg, int ledb, int ledy){
 }
 
 void pointsCountingSound(int pontos, int buzzpin, int ledr, int ledg, int ledb, int ledy, int ledi){
-  int freq_inicial = 500; 
-  int freq_minima = 1500; 
+  int freq_inicial = 400; 
+  int freq_minima = 1000; 
+  int tempo = 300; 
+
+  int freq_atual = freq_inicial;
+
+  for (int i = 0; i < pontos; i++) {
+    gpio_put(ledr,1);
+    gpio_put(ledy,1);
+    gpio_put(ledg,1);
+    gpio_put(ledb,1);
+    som(freq_atual, tempo, buzzpin);
+    gpio_put(ledr,0);
+    gpio_put(ledy,0);
+    gpio_put(ledg,0);
+    gpio_put(ledb,0);
+    busy_wait_ms(200);
+    freq_atual += (freq_minima - freq_inicial) / pontos;
+  }
+  gpio_put(ledi,1);
+}
+
+void recordCounting(uint8_t pontos, int buzzpin, int ledr, int ledg, int ledb, int ledy, int ledi){
+  int freq_inicial = 400; 
+  int freq_minima = 1000; 
   int tempo = 300; 
 
   int freq_atual = freq_inicial;

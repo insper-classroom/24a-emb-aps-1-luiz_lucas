@@ -56,7 +56,7 @@ void confere(int botao, const int v[], int *nc, int *rodada, uint8_t *score, uin
     printf("ERROU\n");
     if (*rodada>*score){
       *score=*rodada;
-      flash_data[0]=*score;
+      flash_data[0]=*score-1;
       pico_flash_write(FLASH_TARGET_OFFSET, flash_data, 1);
     }
     *nc=0;
@@ -135,6 +135,8 @@ int main() {
 
   //pico_flash_erase(FLASH_TARGET_OFFSET);                                                      //++ Flash operation to erase entire flash page ( 256 locations together )
 
+  //playStartupMusic(BUZZPIN);
+
   gpio_put(LED_PIN_I, 1);
 
   gpio_set_irq_enabled_with_callback(BTN_PIN_R, GPIO_IRQ_EDGE_FALL, true, &btn_callback);
@@ -148,14 +150,17 @@ int main() {
   uint32_t *a = (uint32_t*)malloc(1+1);
   a=pico_flash_read(FLASH_TARGET_OFFSET, 1); 
   score=a[0];
-
   int t_count = 0;
+
   while (true) {
 
     if (reset_record == 4) {
       reset_record = 0;
       t=0;
       t_count=0;
+      //pico_flash_erase(FLASH_TARGET_OFFSET);
+      flash_data[0]=0;
+      pico_flash_write(FLASH_TARGET_OFFSET, flash_data, 1);
       printf("TUDO JUNTO\n");
       resetRecordSound(BUZZPIN, LED_PIN_R, LED_PIN_G, LED_PIN_B, LED_PIN_Y);
     }
@@ -226,7 +231,8 @@ int main() {
 
         a=pico_flash_read(FLASH_TARGET_OFFSET, 1); 
         //showPoints(a[1]);
-        pointsCountingSound(20, BUZZPIN, LED_PIN_R, LED_PIN_G, LED_PIN_B, LED_PIN_Y, LED_PIN_I);
+        printf("RECORDE: %d\n", a[0]);
+        recordCounting(a[0], BUZZPIN, LED_PIN_R, LED_PIN_G, LED_PIN_B, LED_PIN_Y, LED_PIN_I);
 
 
       } else if (t_press_duration < 200 && t_count == 1) {
