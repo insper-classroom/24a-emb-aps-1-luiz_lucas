@@ -11,16 +11,6 @@ void som(int freq, int tempo, int pino){
   }
 }
 
-void playStartupMusic(int buzzpin) {
-  int melody[] = {262+200, 330+200, 392+200, 523+200, 392+200, 330+200, 262+200, 196+200};
-  int tempo[] = {200, 200, 200, 200, 200, 200, 200, 200}; 
-
-  for (int i = 0; i < sizeof(melody)-1 / sizeof(melody[0]); i++) {
-    som(melody[i], tempo[i], buzzpin);
-  }
-
-}
-
 void looseSound(int buzzpin, int ledr, int ledg, int ledb, int ledy) {
     int freqs_loose[] = {1000, 800, 600, 400};
     int tempos_loose[] = {200, 200, 200, 400};

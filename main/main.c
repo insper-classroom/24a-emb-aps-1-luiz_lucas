@@ -135,8 +135,6 @@ int main() {
 
   //pico_flash_erase(FLASH_TARGET_OFFSET);                                                      //++ Flash operation to erase entire flash page ( 256 locations together )
 
-  //playStartupMusic(BUZZPIN);
-
   gpio_put(LED_PIN_I, 1);
 
   gpio_set_irq_enabled_with_callback(BTN_PIN_R, GPIO_IRQ_EDGE_FALL, true, &btn_callback);
@@ -151,7 +149,6 @@ int main() {
   a=pico_flash_read(FLASH_TARGET_OFFSET, 1); 
   score=a[0];
   int t_count = 0;
-
   while (true) {
 
     if (reset_record == 4) {
